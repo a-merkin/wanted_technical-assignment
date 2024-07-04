@@ -5,14 +5,13 @@ type ApiConfig<SecurityDataType> = {
   secure?: boolean;
   format?: ResponseType;
   baseURL?: string;
-  [key: string]: any;
 };
 
 type FullRequestParams = AxiosRequestConfig & {
   secure?: boolean;
   path: string;
   type?: ContentType;
-  query?: Record<string, any>;
+  query?: Record<string, string | number | boolean | string[] | number[] | boolean[]>;
   format?: ResponseType;
   body?: unknown;
 };
@@ -94,7 +93,7 @@ export class HttpClient<SecurityDataType = unknown> {
   protected createFormData(input: Record<string, unknown>): FormData {
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: unknown[] = property instanceof Array ? property : [property];
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
         formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
@@ -111,7 +110,7 @@ export class HttpClient<SecurityDataType = unknown> {
    * @returns {Promise<T>} Промис, который разрешается с данными ответа
    * @throws {E} Ошибка, возникшая при выполнении запроса
    */
-  public request = async <T = any, _E = any>({
+  public request = async <T, _E = unknown>({
     secure,
     path,
     type,
