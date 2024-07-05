@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import authService from "./api/services/authService";
+
+const login = () => {
+  authService.login({ login: "test", password: "test" });
+};
+
+login();
 </script>
 
 <template>
@@ -11,7 +17,6 @@ import HelloWorld from './components/HelloWorld.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
