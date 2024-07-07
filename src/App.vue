@@ -2,7 +2,8 @@
 import authService from "./api/services/authService";
 
 const login = () => {
-  authService.login({ login: "test", password: "test" });
+  authService.login({ username: "enter", password: "A505a" });
+  authService.loginByToken({token: '111'})
 };
 
 login();

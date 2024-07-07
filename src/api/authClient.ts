@@ -3,7 +3,7 @@ import { HttpClient, RequestParams } from './httpClient';
 export class AuthClient<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   login = (
       query: {
-        login: string,
+        username: string,
         password: string
       },
       params: RequestParams = {}
@@ -17,10 +17,16 @@ export class AuthClient<SecurityDataType extends unknown> extends HttpClient<Sec
       ...params,
     });
 
-  loginByToken = (params: RequestParams = {}) =>
+  loginByToken = (
+    query: {
+      token: string
+    },
+    params: RequestParams = {}
+  ) =>
     this.request<any, any>({
       path: '/loginByToken',
       method: "POST",
+      query: query,
       format: "json",
       ...params,
     });
