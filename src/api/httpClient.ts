@@ -122,7 +122,7 @@ export class HttpClient<SecurityDataType = unknown> {
       return { success: true, data: response.data };
     } catch (error) {
       console.error("HTTP Request Error:", error);
-      return { success: false, error: error as E };
+      throw error
     }
   };
 }
