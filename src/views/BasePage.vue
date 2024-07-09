@@ -1,11 +1,15 @@
 <template>
   <div>
-    <LogCard v-for="log in wampStore.logs" v-bind="log" />
+    <SearchBar />
+    <div class="content">
+      <LogCard v-for="log in wampStore.logs" v-bind="log" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import LogCard from "../components/LogCard.vue";
+import SearchBar from '../components/SearchBar.vue'
 import { useWampStore } from "../store/wampStore";
 import { useRouter } from "vue-router";
 import { useWampConnected } from "../hooks/useWampConnected";
