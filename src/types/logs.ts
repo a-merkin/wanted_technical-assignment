@@ -1,6 +1,8 @@
+export type LevelType = 'FATAL' | 'ERROR' | 'DEBUG' | 'INFO' | 'TRACE'
+
 export interface LogItem {
   Timestamp: string
-  Level: 'FATAL' | 'ERROR' | 'DEBUG' | 'INFO' | 'TRACE'
+  Level: LevelType
   Message: string
   Source: string
 }

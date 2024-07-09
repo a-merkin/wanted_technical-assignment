@@ -76,14 +76,6 @@ watch(
 </script>
 
 <style scoped>
-.search-container {
-  position: fixed;
-  right: 0px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .navigation-buttons {
   margin-top: 10px;
 }

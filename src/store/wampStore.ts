@@ -1,20 +1,27 @@
 import { defineStore } from 'pinia';
 import wampService from '../websocket/wampService';
 import type { AuthorizationParams, AuthorizationResponse } from '../types/auth';
-import type { LogItem, LogList } from '../types/logs'
+import type { LogItem, LogList, LevelType } from '../types/logs'
 
 interface wampState {
   websocket: typeof wampService | null,
   isWsConnected: Boolean,
-  logs: LogItem[]
+  logs: LogItem[],
+  selectedLevelFilter: LevelType | 'all' | null
 }
 
 export const useWampStore = defineStore('wamp', {
   state: (): wampState => ({
     websocket: null,
     isWsConnected: false,
-    logs: []
+    logs: [],
+    selectedLevelFilter: 'all',
   }),
+  getters: {
+    filteredLogs(): LogItem[] {
+      return this.selectedLevelFilter == 'all' ? this.logs : this.logs.filter(log => log.Level === this.selectedLevelFilter)
+    }
+  },
   actions: {
     connect() {
       this.websocket = wampService 
