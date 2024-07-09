@@ -26,9 +26,10 @@ export class WAMPClient {
 
   /**
    * Создает экземпляр WAMPClient.
-   * @param url - URL сервера WebSocket.
+   * @param socketUrl - socketUrl сервера WebSocket.
+   * @param apiUrl - apiUrl действий в WebSocket.
    */
-  constructor(private url: string) {}
+  constructor(private socketUrl: string, private apiUrl: string) {}
 
   /**
    * Генерирует уникальный идентификатор вызова.
@@ -88,23 +89,28 @@ export class WAMPClient {
    * Устанавливает соединение с сервером WebSocket.
    */
   public connect() {
-    this.socket = new WebSocket(this.url);
+    return new Promise((resolve, reject) => {
+        this.socket = new WebSocket(this.socketUrl);
 
-    this.socket.onopen = () => {
-      console.log('WebSocket connection established');
-    };
+        this.socket.onopen = () => {
+            console.log('WebSocket connection established');
+            resolve('connected');
+        };
 
-    this.socket.onmessage = this.onMessage.bind(this);
+        this.socket.onmessage = this.onMessage.bind(this);
 
-    this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
-      this.sessionId = null;
-    };
+        this.socket.onclose = () => {
+            console.log('WebSocket connection closed');
+            this.sessionId = null;
+            reject('WebSocket connection closed');
+        };
 
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-  }
+        this.socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            reject(error);
+        };
+    });
+}
 
   /**
    * Закрывает соединение с сервером WebSocket.
@@ -123,6 +129,7 @@ export class WAMPClient {
    * @returns Промис, который разрешается с результатом вызова.
    */
   public call<T>(uri: string, ...args: unknown[]): Promise<T> {
+    const socketUrl = `${this.apiUrl + uri}`
     return new Promise((resolve, reject) => {
       if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
         return reject('WebSocket is not connected');
@@ -137,7 +144,7 @@ export class WAMPClient {
         }
       });
 
-      const message: WAMPMessage = [2, callId, uri, ...args];
+      const message: WAMPMessage = [2, callId, socketUrl, ...args];
       this.socket.send(JSON.stringify(message));
     });
   }
@@ -147,13 +154,14 @@ export class WAMPClient {
    * @param uri - URI подписки.
    * @param callback - Функция обратного вызова для обработки событий.
    */
-  public subscribe(uri: string, callback: (event: unknown) => void) {
+  public subscribe(uri: string, callback: (event: unknown) => unknown) {
+    const socketUrl = `${this.apiUrl + uri}`
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       throw new Error('WebSocket is not connected');
     }
 
-    this.subscriptions.set(uri, callback);
-    const message: WAMPMessage = [5, uri];
+    this.subscriptions.set(socketUrl, callback);
+    const message: WAMPMessage = [5, socketUrl];
     this.socket.send(JSON.stringify(message));
   }
 
@@ -162,14 +170,15 @@ export class WAMPClient {
    * @param uri - URI подписки.
    */
   public unsubscribe(uri: string) {
+    const socketUrl = `${this.apiUrl + uri}`
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       throw new Error('WebSocket is not connected');
     }
 
-    if (this.subscriptions.has(uri)) {
-      this.subscriptions.delete(uri);
+    if (this.subscriptions.has(socketUrl)) {
+      this.subscriptions.delete(socketUrl);
     }
-    const message: WAMPMessage = [6, uri];
+    const message: WAMPMessage = [6, socketUrl];
     this.socket.send(JSON.stringify(message));
   }
 

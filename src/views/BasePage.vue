@@ -1,32 +1,31 @@
 <template>
   <div>
-    <LogCard v-for="log in logs" v-bind="log"/>
+    <LogCard v-for="log in wampStore.logs" v-bind="log" />
   </div>
 </template>
 
 <script setup lang="ts">
-import wampService from '../websocket/wampService';
-import subscriptionService from '../api/services/subscriptionService';
-import LogCard from '../components/LogCard.vue';
-import type { Log } from '../types/logTypes';
-import { ref, onMounted } from 'vue';
+import LogCard from "../components/LogCard.vue";
+import { useWampStore } from "../store/wampStore";
+import { useRouter } from "vue-router";
+import { useWampConnected } from "../hooks/useWampConnected";
 
-const socket = wampService
-socket.connect()
+const router = useRouter();
 
-const logs = ref<Log[]>([])
+const wampStore = useWampStore();
 
-const getData = () => {
-  subscriptionService.getLogsList().then((response) => {
-    logs.value = response
-  })
-}
-
-onMounted(() => {
-  getData()
-})
+useWampConnected(() => {
+  wampStore
+    .authToken()
+    ?.then((response) => {
+      localStorage.setItem("token", response.Token);
+      wampStore.startHeartbeat();
+      wampStore.subscribeToLogs();
+    })
+    .catch(() => {
+      router.push("/login");
+    });
+});
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,15 +1,15 @@
 <template>
-  <p>
-    {{ props.timestamp }} {{ props.level }} {{ props.message }} {{ props.source }}
+  <p class="log" :class="{'--warn': props.Level === 'WARN'}">
+    {{ props.Timestamp }} {{ props.Level }} {{ props.Message }} {{ props.Source }}
   </p>
 </template>
 
 <script setup lang="ts">
 interface Props {
-  timestamp: string
-  level: string
-  message: string
-  source: string
+  Timestamp: string
+  Level: string
+  Message: string
+  Source: string
 }
 
 const props = defineProps<Props>()
@@ -17,5 +17,9 @@ const props = defineProps<Props>()
 </script>
 
 <style scoped>
-
+.log {
+  &.--warn {
+    color: rgb(255, 147, 85)
+  }
+}
 </style>

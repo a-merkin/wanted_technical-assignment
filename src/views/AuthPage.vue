@@ -17,22 +17,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useAuthStore } from '@/store/authStore';
+import { ref } from "vue";
+import { useWampStore } from "../store/wampStore";
+import { useRouter } from "vue-router";
 
-const username = ref('');
-const password = ref('');
-const error = ref('');
+const router = useRouter()
+const wampStore = useWampStore();
 
-const authStore = useAuthStore();
+const username = ref("");
+const password = ref("");
+const error = ref("");
 
-const handleSubmit = async () => {
-  error.value = '';
-  try {
-    await authStore.login({ username: username.value, password: password.value });
-  } catch (err) {
-    error.value = err;
-  }
+const handleSubmit = () => {
+  wampStore
+    .auth({ username: username.value, password: password.value })
+    ?.then((response) => {
+      localStorage.setItem('token', response.Token)
+      router.push('/')
+    })
+    .catch(({description}) => {
+      error.value = description;
+    });
 };
 </script>
 
