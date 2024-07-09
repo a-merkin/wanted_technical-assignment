@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import SideBar from '../components/SideBar.vue'
+import SideBar from "../components/SideBar.vue";
 import LogCard from "../components/LogCard.vue";
 import { useWampStore } from "../store/wampStore";
 import { useRouter } from "vue-router";
